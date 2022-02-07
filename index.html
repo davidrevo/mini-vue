@@ -1,0 +1,22 @@
+<div id="app"></div>
+
+<script type="module">
+import { mountEl } from './mount.js'
+import { h } from './h.js'
+const vnodes = h('div', {class: 'div'}, [
+  h('h2', {class: 'h2'}, '你好'),
+  h('button', {onClick: () => console.log('你好')}, '点击打印')
+])
+
+mountEl(vnodes, document.querySelector('#app'))
+</script>
+
+<style>
+h2 {
+  color: orange;
+}
+
+button {
+  display: block;
+}
+</style>
