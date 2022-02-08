@@ -3,12 +3,24 @@
 <script type="module">
 import { mountEl } from './mount.js'
 import { h } from './h.js'
+import { patch } from './patch.js'
+
 const vnodes = h('div', {class: 'div'}, [
   h('h2', {class: 'h2'}, '你好'),
   h('button', {onClick: () => console.log('你好')}, '点击打印')
 ])
 
 mountEl(vnodes, document.querySelector('#app'))
+
+const vnodes2 = h('a', { class: 'header', id: 'div' }, [
+  h('h2', null, '新的h2'),
+  h('button', { onclick: function(){ console.log('按钮点击了') } }, '点击-1')
+])
+
+// 为了看出效果，延迟两秒执行更新操作
+setTimeout(() => {
+  patch(vnodes, vnodes2)
+}, 2000)
 </script>
 
 <style>

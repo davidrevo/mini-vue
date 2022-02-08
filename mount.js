@@ -1,6 +1,5 @@
 export function mountEl (vnode, container) {
   const el = vnode.el = document.createElement(vnode.type)
-  debugger
   // 判断是否有传入属性
   if (vnode.props) {
     // 拿到所有的key

@@ -1,6 +1,7 @@
+import { mountEl as mount } from './mount.js'
 // n1: 旧的VNodes
 // n2: 新的VNodes
-function patch (n1, n2) {
+export function patch (n1, n2) {
   // 如果两个类型不一样，那么就卸载n1，挂载n2
   if (n1.type !== n2.type) {
     // 拿到n1的父元素，在父元素卸载n1
@@ -38,6 +39,51 @@ function patch (n1, n2) {
       }
       if (!(key in newProps)) {
         el.removeAttribute(key)
+      }
+    }
+
+    // 对两个VNodes的children进行处理
+    // 如果n2.children的类型为string，那么直接替换掉n1的子元素
+    const oldChildren = n1.children || []
+    const newChildren = n2.children || []
+    if (typeof newChildren === 'string') {
+      // 也可以对n1的children进行类型判断，可以做一定程度的优化
+      if (typeof oldChildren === "string") {
+        // 如果都为字符串类型，那么就只有当他们之间的值不一样的时候才进行替换
+        if (newChildren !== oldChildren) {
+          el.textContent = newChildren
+        }
+      } else {
+        // 如果oldChildren类型不为字符串，则直接将n1的innerHTML更换为newChildren
+        el.innerHTML = newChildren
+      }
+    } else {
+      // 如果newChildren的类型不为字符串，那么就判断oldChildren的类型是否为字符串
+      // 注意：这里不会对其他类型进行考虑，例如插槽的对象类型，这里只对字符串和数组类型进行判断
+      if (typeof oldChildren === 'string') {
+        // 如果oldChildren的类型为字符串，就将newChildren的元素挂载到el上面
+        el.innerHTML = ''
+        newChildren.forEach(item => mount(item.el))
+      } else {
+        // 如果newChildren和oldChildren都为数组
+        // oldChildren：[v1,v5,v6,v7,v8]
+        // newChildren：[v1,v2,v3]
+        // 拿两个数组之间长度最短的值
+        const minLength = Math.min(newChildren.length, oldChildren.length)
+        for (let i = 0; i < minLength; i++) {
+          // 获取他们之间的VNode进行patch递归调用
+          patch(oldChildren[i], newChildren[i])
+        }
+
+        // 如果oldChildren的长度比newChildren的长度长，那么就卸载多出来的VNode
+        if (newChildren.length < oldChildren.length) {
+          oldChildren.slice(newChildren.length).forEach(item => el.removeChild(item.el))
+        }
+
+        // 如果newChildren的长度比oldChildren的长度长，那么就挂载元素
+        if (newChildren.length > oldChildren.length) {
+          newChildren.slice(oldChildren.length).forEach(item => mount(item, el))
+        }
       }
     }
   }
