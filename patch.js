@@ -63,7 +63,7 @@ export function patch (n1, n2) {
       if (typeof oldChildren === 'string') {
         // 如果oldChildren的类型为字符串，就将newChildren的元素挂载到el上面
         el.innerHTML = ''
-        newChildren.forEach(item => mount(item.el))
+        newChildren.forEach(item => mount(item.el, el))
       } else {
         // 如果newChildren和oldChildren都为数组
         // oldChildren：[v1,v5,v6,v7,v8]
